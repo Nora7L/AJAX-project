@@ -1,3 +1,4 @@
+<?php header( 'Location: /index.html' ) ; ?>
 <?PHP
 
 	require_once('connect.php');
