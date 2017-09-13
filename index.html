@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>music</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<style type="text/css">
+		*{margin: 0;padding: 0;}
+    html{width: 100%;height: 100%;overflow: hidden;}
+    body{width: 100%;height: 100%;font: 14px/1.5 Tahoma,Arial,Roboto,"Droid Sans","Helvetica Neue","Droid Sans Fallback","Heiti SC",sans-self;}
+    li{list-style: none;}
+    #main{width: 100%;height: 100%;position: relative;margin: 0 auto;}
+    #musicList{width: 100%;height: 100%;background: url(img/bg.jpg) no-repeat;background-size: cover;}
+    #musicList .list_title{width: 100%;height: 40px;background:rgba(41,171,226,0.6); font-size:20px; line-height:40px; text-align:center; color:white; position:absolute; top:0;}
+    #musicList .list_tip{ width:16px; height:16px; background:url(img/tip.png) no-repeat; background-size:cover; position:absolute; right:15px; top:12px;}
+    #musicList .list_audio{ width:100%; height:65px; background:url(img/list_audioBg.png) repeat-x; position:absolute; bottom:0;}
+    #musicList .list_audioImg{ width:50px; border-radius:50%; float:left; margin:7px 0 0 15px;}
+    #musicList .list_audioText{ float:left;}
+    #musicList .list_audioBtn{ float:right; width:32px; height:32px; background:url(img/list_audioPlay.png) no-repeat; background-size:cover; margin:16px 15px 0 0; display:none;}
+    .title{ color:white; font-size:15px; padding:10px 0 0 20px;}
+    .name{ color:#b3b3b3; font-size:13px; padding:2px 0 0 20px;}
+    #musicList .list_content{ width:100%; position:absolute; top:40px; bottom:65px; overflow:hidden;}
+    #musicList .list_content ul{ width:100%; position:absolute; top:0; left:0; transform:translate3d(0,0,0);}
+    #musicList .list_content ul li{ width:100%; height:60px; background:rgba(26,26,26,0.6); border-bottom:1px #999999 solid; box-sizing:border-box;} 
+    #musicList .list_content ul li.active{ border-left:5px #29abe2 solid;}
+    #musicDetails{ width:100%; height:100%; background:url(img/detailsBg.jpg) no-repeat; background-size:cover; position:absolute; top:0; left:0; z-index:10; background-position:bottom;margin:0 auto;right: 0;overflow: hidden;}
+    #musicDetails .details_tip{ width:19px; height:10px; background:url(img/details_arrow.png) no-repeat; background-size:cover; position:absolute; right:15px; top:15px;}
+    #musicDetails .details_title{width:100%; height:40px; background:rgba(41,171,226,0.6); font-size:20px; line-height:40px; text-align:center; color:white; position:absolute; top:0;}
+    #musicDetails .details_name span{ font-size:12px;}
+    #musicDetails .details_audio{width:100%; height:150px; position:absolute; bottom:0;}
+    #musicDetails .details_audioAll{ width:200px; margin:20px auto; position:relative;}
+    #musicDetails .details_audioPro{ width:100%; height:2px; background:white;}
+    #musicDetails .details_audioProUp{ width:0; height:2px; background:#29abe2; position:absolute; left:0; top:0;}
+    #musicDetails .details_audioProBar{ width:15px; height:15px; background:#29abe2; border-radius:50%; position:absolute; left:0; top:0; margin:-7px;}
+    #musicDetails .details_nowTime{ font-size:12px; color:#b3b3b3; position:absolute; top:-8px; left:-40px;}
+    #musicDetails .details_allTime{ font-size:12px; color:#b3b3b3; position:absolute; top:-8px; right:-40px;}
+    #musicDetails .details_play{ width:55px; height:55px; background:url(img/details_play.png) no-repeat; background-size:cover; position:absolute; left:50%; margin-left:-27px; top:30px;}
+    #musicDetails .details_prev{ width:37px; height:37px; background:url(img/details_prev.png) no-repeat; background-size:cover; position:absolute; left:10px; top:37px;}
+    #musicDetails .details_next{ width:37px; height:37px; background:url(img/details_next.png) no-repeat; background-size:cover; position:absolute; right:10px; top:37px;}
+    #musicDetails .details_btn{ width:100%; position:absolute; bottom:10px; text-align:center;}
+    #musicDetails .details_btn li{ width:7px; height:7px; background:#29abe2; border-radius:5px; display:inline-block; margin:3px;transition:.5s;}
+    #musicDetails .details_btn li.active{ width:21px;}
+    #musicList .list_audioImg.move{ 
+      animation:4s linear infinite audioImgMove; 
+      -webkit-animation:4s linear infinite audioImgMove;
+    }
+    @keyframes audioImgMove{
+      0%{ transform:rotate(0deg);}
+      100%{ transform:rotate(360deg);}
+    }
+    @-webkit-keyframes audioImgMove{
+      0%{ -webkit-transform:rotate(0deg);}
+      100%{ -webkit-transform:rotate(360deg);}
+    }
+    #musicDetails .details_lyric{ width:100%; position:absolute; top:40px; bottom:150px; overflow:hidden; transition:.5s; -webkit-transition:.5s;}
+    #musicDetails .details_lyric ul{ width:100%; text-align:center; color:white; font-size:14px; position:absolute; top:0; left:0; transition:.2s; -webkit-transition:.2s;}
+    #musicDetails .details_lyric li{ margin-top:15px;}
+    #musicDetails .details_lyric li.active{ color:#00ffff;}
+    #musicDetails .details_message{ width:80%; position:absolute; top:40px; bottom:50px; margin-left:10%; transition:.5s; -webkit-transition:.5s;}
+    #musicDetails .details_message textarea{ width:100%; height:100px; background:#9babb2; border-radius:5px; margin-top:10px;}
+    /*textarea的placeholder*/
+    ::-webkit-input-placeholder{ color:#666;}
+    ::-moz-input-placeholder{ color:#666;}
+    #musicDetails .details_message input{ width:100%; height:30px; color:white; background:#29abe2; border-radius:5px; border:none;}
+    #musicDetails .details_message ul{ width:100%; font-size:12px;}
+    #musicDetails .details_message li{ background:rgba(26,26,26,0.6); border-radius:5px; padding:10px; color:white; float:left; clear:both; margin-top:10px; transition:1s; -webkit-transition:1s;}
+    #loading{width: 100%;height: 100%;background-color: black;position: absolute;left: 0;top: 0;z-index: 20;overflow: hidden;}
+    #loading .content1,#loading .content2{width: 30px;height: 30px;position: absolute;left: 50%;top: 50%;margin: -15px;}
+    #loading .content1 div,#loading .content2 div{width: 8px;height: 8px;background-color: white;position: absolute;border-radius: 50%;animation: 2s linear infinite loadingMove;--webkit-animation: 2s linear infinite loadingMove;}
+    
+    .acr1{left: 0;top: 0;}
+    .arc2{right: 0;top: 0;}
+    .arc3{left: 0;bottom: 0;}
+    .arc4{right: 0;bottom: 0;}
+    #loading .content2{transform: rotate(45deg);--webkit-transform: rotate(45deg);}
+    @keyframes loadingMove{
+      0%{-webkit-transform: scale(1);
+      -moz-transform: scale(1);
+      -ms-transform: scale(1);
+      -o-transform: scale(1);
+      transform: scale(1);
+      }
+      50%{
+        -webkit-transform:scale(0);
+        -moz-transform: scale(0);
+        -ms-transform: scale(0);
+        -o-transform: scale(0);
+        transform: scale(0);
+        
+      }
+      100%{
+        -webkit-transform:scale(1) ;
+        -moz-transform:scale(1) ;
+        -ms-transform:scale(1) ;
+        -o-transform:scale(1) ;
+        transform:scale(1) ;
+        
+      }
+    }
+    #loading .content1 .arc1{animation-delay:-0.1s; }
+    #loading .content2 .arc1{animation-delay:-0.3s; }
+    #loading .content1 .arc2{animation-delay:-0.5s; }
+    #loading .content2 .arc2{animation-delay:-0.7s; }
+    #loading .content1 .arc3{animation-delay:-0.9s; }
+    #loading .content2 .arc3{animation-delay:-1.1s; }
+    #loading .content1 .arc4{animation-delay:-1.3s }
+    #loading .content2 .arc4{animation-delay:-1.5s; }
+  </style>
+  <script src="jquery-2.1.3.min.js"></script>
+  <script type="text/javascript">
+   $(function(){
+     var viewWidth = $(window).width();
+     var viewHeight = $(window).height();
+     var desWidth = 640;
+     var touchstart = 'touchstart';
+     var touchmove = 'touchmove';
+     var touchend = 'touchend';
+     var id = 0;
+     var index = 0;
+     var oAudio = $('#audio1').get(0);
+
+
+     var $main = $('#main');
+     var $listContentUl = $('#listContentUl');
+     var $listTitle = $('#listTitle');
+     var $listContent = $('#listContent');
+
+     var $musicDetails = $('#musicDetails');
+     var $detailsTitle = $('#detailsTitle');
+     var $listAudio = $('#listAudio')
+     var $listAudioImg = $('#listAudioImg');
+     var $listAudioText = $('#listAudioText');
+     var $listAudioBtn = $('#listAudioBtn');
+
+     var $detailsName = $('#detailsName');
+
+      var $detailsAudioProUp = $('#detailsAudioProUp');
+      var $detailsAudioProBar = $('#detailsAudioProBar');
+      var $detailsNowTime = $('#detailsNowTime');
+      var $detailsAllTime = $('#detailsAllTime');
+      var $detailsPlay = $('#detailsPlay');
+      var $detailsPrev = $('#detailsPrev');
+      var $detailsNext = $('#detailsNext');
+
+      var $detailsLyric = $('#detailsLyric');
+      var $detailsLyricUl = $('#detailsLyricUl');
+
+      var $detailsAudio = $('#detailsAudio')
+
+      var $detailsMessage = $('#detailsMessage')
+      var $detailsMessageTa = $('#detailsMessageTa')
+      var $detailsMessageBtn = $('#detailsMessageBtn')
+      var $detailsMessageUl = $('#detailsMessageUl');
+      var $detailsBtn = $("#detailsBtn");
+
+      var $loading = $('#loading')
+
+       //整个项目的初始化
+       function init(){
+        loading();
+         device();
+         musicList.init();
+         musicDetails.init();
+         musicAudio.init();
+
+
+
+       }
+       function loading(){//loading--实现图片的预加载
+         var arr = ['bg.jpg','detailsBg.jpg','list_audioBg.png','details_play.png','details_pause.png'];
+         var iNum = 0;
+         $.each(arr,function(i,img){
+            var objImg = new Image();
+            objImg.onload = function(){
+                iNum++;
+                if (iNum == arr.length) {
+                  $loading.animate({opacity:0},1000,function(){
+                    $(this).remove();
+                  })
+                }
+            };
+            objImg.onerror = function(){
+              $loading.animate({opacity:0},1000,function(){
+                    $(this).remove();
+                  })
+            }
+            objImg.src =' img/' +img
+         })
+       }
+       //兼容PC和移动端
+       function device(){
+        //区分pc移动
+        // console.log(navigator.userAgent)
+        var isMobile = /Mobile/i.test(navigator.userAgent);
+
+        if (viewWidth > desWidth) {
+          $main.css("width","640px");
+          $musicDetails.css("width","640px")
+
+        }
+        //判断是移动端还是PC
+        if (!isMobile) {
+          touchstart = 'mousedown';
+          touchmove = 'mousemove';
+          touchend = 'mouseup';
+
+        }
+        /*resize检测尺寸变化*/
+        $(window).resize(function(){
+           viewWidth = $(window).width();
+           viewHeight = $(window).height();
+           musicDetails.slideDown();
+        });
+      }
+
+       var musicList = (function(){//音乐列表操作
+
+         var bbsUrl ='http://naro7l.lofter.com/';
+         var listUrl ='musicList.php';
+         var downY = 0;
+         var downT = 0;
+         var parentH = $listContent.height();
+         var childH = $listContentUl.height();
+         var onoff1 = true;
+         var onoff2 = true;
+         var onoff3 = true;
+         var time = null;
+         var speed = 0;
+         var prevY = 0;
+         var $loadingLi = null;
+         var page = 0;
+
+       function init(){  //初始
+        data();
+        bind();
+        moveScroll();
+      }
+       function data(){//数据引入
+        $.ajax({
+         url : listUrl,
+         type: 'GET',
+         dataType:'json',
+         success: function(data){
+           $.each(data,function(i,obj){
+            var $li='<li musicId="'+(obj.id)+'"><h3 class="title">'+(obj.musicName)+'</h3><p class="name">'+(obj.name)+'</p></li>'
+            $listContentUl.append($li);
+
+          })
+           childH = $listContentUl.height();
+         }
+       })
+
+      }
+       function bind(){//touchstart移动端事件
+        $listTitle.on(touchend,function(){
+            // alert(111)
+            window.location = bbsUrl;
+          });
+        $listContentUl.delegate('li',touchstart,function(){
+          if (onoff3) {
+          $(this).attr('class','active').siblings().attr('class','');
+          id = $(this).attr('musicId');
+          musicAudio.loadMusic(id);
+          index = $(this).index();
+          }
+        });
+        $listAudio.on(touchstart,function(){
+          if (id) {
+          musicDetails.slideUp();
+          }
+        })
+      }
+
+       function moveScroll(){ //移动端滑屏
+         /*transform:translate3d(0,0,0);开启gpu加速*/
+         $(document).on(touchmove,function(ev){
+           ev.preventDefault();
+         });
+         $listContentUl.on(touchstart,function(ev){
+
+          if (parentH > childH) {return false;}
+
+               // ev.pageX
+               // touch.pageX
+               // ev.originalEvent -> JQ的event转成js的
+               //兼容
+               var touch = ev.originalEvent.changedTouches ? ev.originalEvent.changedTouches[0] : ev;
+               var This = this;
+               downY = touch.pageY;
+               prevY = touch.pageY;
+               downT = $(this).position().top;
+               onoff1 = true;
+               onoff2 = true;
+               onoff3 = true;
+               clearInterval(time);
+
+
+              // console.log(touch.pageX)
+              //通过改变transform的translate3D的y值实现拖动
+              $(document).on(touchmove+'.move',function(ev){
+               onoff3 = false;
+               var touch = ev.originalEvent.changedTouches?ev.originalEvent.changedTouches[0]:ev;
+
+               var iTop = $(This).position().top;
+
+               speed = touch.pageY - prevY;
+               prevY = touch .pageY;
+
+               if (iTop >= 0) {//头
+                 if (onoff1) {
+                  onoff1 = false;
+                  downY = touch.pageY;
+                }
+                $(This).css('transform','translate3d(0,'+(touch.pageY - downY )/3+'px,0)');
+
+              }
+               else if (iTop <= parentH - childH) {//尾
+                 if (onoff2) {
+                  onoff2 = false;
+                  downY = touch.pageY;
+                  $loadingLi = $('<li style="color:white;">loading...</li>');
+                  $(This).append($loadingLi);
+                }
+                $(This).css('transform','translate3d(0,'+((touch.pageY - downY )/3+(parentH - childH))+'px,0)');
+              }
+               else{//正常              
+                $(This).css('transform','translate3d(0,'+(touch.pageY - downY + downT)+'px,0)');
+              }
+
+            });
+              /*'.move'jq的命名空间*/
+              $(document).on(touchend+'.move',function(){
+                 //取消事件
+                 $(this).off('.move');
+                 if ($loadingLi) { //懒加载数据
+                     $loadingLi.remove();
+                     $loadingLi = null;
+                     $.ajax({
+                      url:'pageMusic.php',
+                      type:'GET',
+                      dataType:'json',
+                      data:{page:page},
+                      success: function (data){
+                        $.each(data,function(i,obj){
+                          var $li='<li musicId="'+(obj.id)+'"><h3 class="title">'+(obj.musicName)+'</h3><p class="name">'+(obj.name)+'</p></li>'
+                          $listContentUl.append($li);
+
+                        })
+                        childH = $listContentUl.height();
+                        page++;
+                      }
+                     })
+                 }
+                 if (!onoff3) {
+                   clearInterval(time);
+                   time = setInterval(function(){
+                    var iTop = $(This).position().top;
+                    if (Math.abs(speed) <=1 || iTop > 50 || iTop < parentH - childH - 50) {
+                     clearInterval(time);
+                     if(iTop >= 0){
+                      $(This).css('transition','.2s');
+                      $(This).css('transform','translate3d(0,0,0)');
+                    }
+                    else if(iTop <= parentH - childH){
+                      $(This).css('transition','.2s');
+                      $(This).css('transform','translate3d(0,'+(parentH - childH)+'px,0)');
+                    }
+                  }
+                  else{
+                   speed *=0.9;
+                   $(This).css('transform','translate3d(0,'+(iTop+speed)+'px,0)');
+                 }
+
+               },13);
+                 }
+
+               });
+              return false;
+
+            });
+         $listContentUl.on('transition webkitTransitionEnd',function(){
+          $(this).css('transition','');
+        })
+       }
+       function show(sName,sMusicName,sImg){//显示当前歌曲
+          $listAudioImg.attr('src','img/'+sImg);
+          $listAudioText.find('h3').html(sMusicName);
+          $listAudioText.find('p').html(sName);
+          $listAudioBtn.show()
+
+       }
+       return {
+        init : init,
+        show : show
+      };
+
+    })();
+
+
+    /*详情页*/
+    var musicDetails = (function(){
+      var re = /\[[^[]+/g;
+      var arr = [];
+      var $li = null;
+      var iLiH = null;
+      var downX =0;
+      var range = 20;
+      var timer = null;
+      function init(){
+         $musicDetails.css('transform','translate3d(0,'+(viewHeight)+'px,0)');
+         $detailsMessage.css('transform','translate3d('+(viewWidth)+'px,0,0)')
+          bind();
+      }
+      //向上展开
+      function slideUp(){
+         $musicDetails.css('transition','.5s');
+
+         $musicDetails.css('transform','translate3d(0,0,0)');
+          
+      }
+      //向下收缩
+      function slideDown(){
+         $musicDetails.css('transform','translate3d(0,'+(viewHeight)+'px,0)');
+         $musicDetails.one('transitionend weikitTransitionEnd',function(){
+           $detailsLyric.add($detailsAudio).css('transform','translate3d(0,0,0)');
+           $detailsMessage.css('transform','translate3d('+(viewWidth)+'px,0,0)');
+           $detailsBtn.find('li').eq(0).attr('class','active').siblings().attr('class','');
+
+         });
+          
+      }
+      //事件
+      function bind(){
+          $detailsTitle.on(touchstart,function(){
+            slideDown();
+          })
+          $musicDetails.on(touchstart,function(ev){
+          var touch = ev.originalEvent.changedTouches ? ev.originalEvent.changedTouches[0] : ev;
+          downX = touch.pageX;
+          /*留言和详情的左右滑动*/
+          $(document).on(touchend+'.move',function(ev){
+            $(this).off('.move')
+          var touch = ev.originalEvent.changedTouches ? ev.originalEvent.changedTouches[0] : ev;
+             if (touch.pageX - downX < -range) {
+                 $detailsLyric.add($detailsAudio).css('transform','translate3d('+(-viewWidth)+'px,0,0)');
+                 $detailsMessage.css('transform','translate3d(0,0,0)');
+                 $detailsBtn.find('li').eq(1).attr('class','active').siblings().attr('class','');
+                 loadMessage();
+                 clearInterval(timer);
+                 timer = setInterval(moveMessage,3000)
+             }
+             else if (touch.pageX - downX > range) {
+                $detailsLyric.add($detailsAudio).css('transform','translate3d(0,0,0)');
+                 $detailsMessage.css('transform','translate3d('+(viewWidth)+'px,0,0)');
+                 $detailsBtn.find('li').eq(0).attr('class','active').siblings().attr('class','');
+                 clearInterval(timer);
+
+
+             }
+          });
+             
+          });
+        $detailsMessageBtn.on(touchstart,function(){
+           addMessage();
+        });
+      }
+      function show(sName,sMusicName,sLyric){ //显示
+         $detailsName.html(sMusicName+'  <span>'+sName+'</span>');
+         $detailsLyricUl.empty().css('transform','translate3d(0,0,0)')
+         arr = sLyric.match(re);
+         /*trim()]去掉左右空格*/
+         for (var i = 0; i < arr.length; i++) {
+           arr[i] = [formatTime(arr[i].substring(0,10)),arr[i].substring(10).trim()]
+         }
+         // console.log(arr)
+         for (var i = 0; i < arr.length; i++) {
+           $detailsLyricUl.append('<li>'+arr[i][1]+'</li>');
+         }
+         $li = $detailsLyricUl.find('li');
+         $li.first().attr('class','active');
+         /*outerHeight*/
+         iLiH = $li.first().outerHeight(true)
+
+
+      }
+      function formatTime(num){//格式化歌词的时间
+        //变秒
+        num = num.substring(1,num.length-1);
+
+        var arr = num.split(':');
+        // console.log(parseFloat(arr[0]*60) + parseFloat(arr[1]).toFixed(2))
+
+        return (parseFloat(arr[0]*60) + parseFloat(arr[1])).toFixed(2);
+
+      }
+      function scrollLyric(ct){//滚动歌词
+        // console.log(ct)
+        for (var i = 0; i < arr.length; i++) {
+          if (i !=arr.length - 1 && ct > arr[i][0] && ct < arr[i+1][0]) {
+           $li.eq(i).attr('class',"active").siblings().attr('class','');
+           if (i>3) {
+             $detailsLyricUl.css('transform','translate3d(0,'+(-iLiH*(i-3))+'px,0)');
+           }
+           else{
+             $detailsLyricUl.css('transform','translate3d(0,0,0)');
+
+           }
+         }
+         else if (i == arr.length-1 && ct > arr[i][0]){
+           $li.eq(i).attr('class',"active").siblings().attr('class','');
+           $detailsLyricUl.css('transform','translate3d(0,'+(-iLiH*(i-3))+'px,0)');
+
+
+         }
+       }
+     }
+     function loadMessage(){//载入留言
+         $detailsMessageUl.empty();
+         $.ajax({
+          url:'loadMessage.php',
+          type:'GET',
+          dataType:'json',
+          data:{mid:id},
+          success:function(data){
+            // console.log(data);
+            $.each(data,function(i,obj){
+              var $li = $('<li>'+(obj.text)+'</li>');
+              /*prepend添加到头部*/
+              $detailsMessageUl.prepend($li)
+            })
+          }
+         })
+     }
+          
+     function  addMessage(){//添加留言
+      var value = $detailsMessageTa.val();
+      $detailsMessageTa.val('');
+         $.ajax({
+          url:'addMessage.php',
+          type:'POST',
+          dataType:'json',
+          data:{mid : id,text : value},
+          success:function(data){
+            if (data.code) {
+              var $li = $('<li>'+(data.message)+'</li>')
+              if (data.message == '') {
+                return false;
+              }
+              $detailsMessageUl.prepend($li)
+            }
+          }
+         })
+     }
+     function moveMessage(){//滚动留言
+         var $last = $detailsMessageUl.find('li').last();
+         $detailsMessageUl.prepend($last);
+         $last.css('opacity',0);
+         setTimeout(function(){
+          $last.css('opacity',1);
+         },200)
+     }
+      return {
+        init:init,
+        slideUp:slideUp,
+        slideDown:slideDown,
+        show : show,
+        scrollLyric:scrollLyric
+      }
+    })()
+
+    var musicAudio = (function(){//音乐播放
+      var onoff=true;
+      var timer = null;
+      var scale = 0;
+      var disX = 0;
+      var parentW = $detailsAudioProBar.parent().width()
+      function init(){//初始
+        bind();
+      }
+      function loadMusic(id){ //载入音乐
+        $.ajax({
+          url:'musicAudio.php',
+          type:'GET',
+          dataType:'json',
+          data:{id:id},
+          async: false,//苹果下面能过播放
+          success: function(data){
+            // console.log(data)
+            show(data);
+          }
+        })
+      }
+      function show(obj){
+          var sName = obj.name;
+          var sMusicName = obj.musicName;
+          var sLyric = obj.lyric;
+          var sImg = obj.img;
+          var sAudio = obj.audio;
+          musicList.show(sName,sMusicName,sImg);
+          musicDetails.show(sName,sMusicName,sLyric);
+          oAudio.src = 'img/'+sAudio;
+          /*canplaythrough音乐加载完毕触发的事件*/
+          /*one事件-只执行一次*/
+          play();
+          $(oAudio).one('canplaythrough',function(){
+              
+              $detailsAllTime.html(formatTime(oAudio.duration))
+          })
+
+           $(oAudio).one('ended',function(){
+              next();
+          })
+      }
+      function play(){//播放
+        onoff = false;
+         $listAudioImg.addClass('move');
+         $listAudioBtn.css('backgroundImage','url(img/list_audioPause.png)');
+         $detailsPlay.css('backgroundImage','url(img/details_pause.png)');
+         oAudio.play();
+         playing();
+         clearInterval(timer);
+         timer = setInterval(playing,1000);
+      }
+      function pause(){//暂停
+        onoff = true;
+         $listAudioImg.removeClass('move');
+         $listAudioBtn.css('backgroundImage','url(img/list_audioPlay.png)');
+         $detailsPlay.css('backgroundImage','url(img/details_play.png)');
+         oAudio.pause()
+         clearInterval(timer);
+
+      }
+      function bind(){
+        /*JQ的add方法*/
+         $listAudioBtn.add($detailsPlay).on(touchstart,function(){
+         if (onoff) {
+          play()
+         }
+         else{
+          pause()
+         }
+         /*阻止冒泡*/
+         return false;
+         })
+         $detailsAudioProBar.on(touchstart,function(ev){
+          var touch = ev.originalEvent.changedTouches ? ev.originalEvent.changedTouches[0] : ev;
+          var This = this;
+          disX = touch.pageX - $(this).position().left;
+          clearInterval(timer);
+
+          $(document).on(touchmove+'.move',function(ev){
+            var touch = ev.originalEvent.changedTouches ? ev.originalEvent.changedTouches[0] : ev;
+
+            var L = touch.pageX - disX;
+            /*限制范围*/
+            if(L<=0){
+              L = 0;
+            }
+            else if(L >= parentW){
+              L = parentW;
+            }
+            $(This).css('left', L );
+            scale = L/parentW;
+          });
+
+          $(document).on(touchend+'.move',function(){
+            $(this).off('.move');
+            oAudio.currentTime = scale * oAudio.duration;
+            playing();
+            clearInterval(timer);
+            timer = setInterval(playing,1000);
+          });
+          return false;
+         })
+         $detailsPrev.on(touchstart,function(){
+           prev()
+         });
+         $detailsNext.on(touchstart,function(){
+           next()
+         });
+
+      }
+      //格式化时间：音乐audio的时间duration
+      function formatTime(num){
+          num = parseInt(num);
+          var iM = Math.floor(num%3600/60);
+          var iS = Math.floor(num%60);
+          return toZero(iM) +':'+toZero(iS);
+      }
+      //补零
+      function toZero(num){
+          if (num < 10) {
+            return '0'+num;
+          }
+          else{
+            return ''+ num;
+          }
+      }
+      function playing(){//播放进行中
+         /*
+         1.当前时间的变化
+         2.进度条的变化
+         */
+        $detailsNowTime.html(formatTime(oAudio.currentTime));
+        scale = oAudio.currentTime / oAudio.duration;
+        $detailsAudioProUp.css('width',scale*100+'%');
+        $detailsAudioProBar.css('left',scale*100+'%');
+        musicDetails.scrollLyric(oAudio.currentTime);
+
+      }
+      function next(){//下一首歌
+        var $li = $listContentUl.find('li')
+        index = index == $li.length - 1 ?0: index +1;
+        id = $li.eq(index).attr('musicId');
+        $li.eq(index).attr('class','active').siblings().attr('class','');
+         loadMusic(id);
+      }
+      function prev(){//上一首歌
+         var $li = $listContentUl.find('li')
+        index = index == 0 ?$li.length - 1: index -1;
+        id = $li.eq(index).attr('musicId');
+        $li.eq(index).attr('class','active').siblings().attr('class','');
+
+         loadMusic(id);
+      }
+      return{
+        init : init,
+        loadMusic : loadMusic
+      }
+    })();
+
+    init();
+
+  });
+</script>
+</head>
+<body>
+	<div id="main">
+  <div id="loading">
+    <div class="content1">
+      <div class="arc1"></div>
+      <div class="arc2"></div>
+      <div class="arc3"></div>
+      <div class="arc4"></div>
+    </div>
+    <div class="content2">
+      <div class="arc1"></div>
+      <div class="arc2"></div>
+      <div class="arc3"></div>
+      <div class="arc4"></div>
+    </div>
+  </div>
+		<div id="musicList">
+			<div class="list_title" id="listTitle">Naro的音乐播放器<span class="list_tip"></span></div>
+			<div class="list_content" id="listContent">
+				<ul id="listContentUl">
+					<!-- <li class="active">
+						<h3 class="title">逆战</h3>
+					    <p class="name">张杰</p>
+           </li> -->
+         </ul>
+       </div>
+       <div class="list_audio" id="listAudio">
+        <img src="img/a2.png" class="list_audioImg" id="listAudioImg">
+        <div class="list_audioText" id="listAudioText">
+         <h3 class="title">Naro</h3>
+         <p class="name">音乐播放器</p>
+       </div>
+       <div class="list_audioBtn" id="listAudioBtn"></div>
+     </div>
+   </div>
+ </div>
+ <!-- 详情 -->
+ <div id="musicDetails">
+   <div class="details_title" id="detailsTitle">
+     <div class="details_name" id="detailsName"></div>
+     <span class="details_tip"></span>
+   </div>
+      <!-- 歌词 -->
+   <div class="details_lyric" id="detailsLyric" >
+   <ul id="detailsLyricUl">
+<!--      <li>wenziwenziwenzi</li>
+     <li>wenziwenziwenzi</li>
+     <li>wenziwenziwenzi</li>
+     <li>wenziwenziwenzi</li> -->
+   </ul>     
+   </div>
+   <div class="details_audio" id="detailsAudio">
+     <div class="details_audioAll">
+      <div class="details_audioPro">
+        <div id="detailsAudioProUp" class="details_audioProUp"></div>
+        <div id="detailsAudioProBar" class="details_audioProBar"></div>
+      </div>
+          <div id="detailsNowTime" class="details_nowTime">00:00</div>
+          <div id="detailsAllTime" class="details_allTime">00:00</div>
+          <div id="detailsPlay" class="details_play"></div>
+          <div id="detailsPrev" class="details_prev"></div>
+          <div id="detailsNext" class="details_next"></div>
+     </div>
+   </div>
+   <!-- 留言页面 -->
+   <div class="details_message" id="detailsMessage">
+      <textarea placeholder="文明听歌，理性留言" id="detailsMessageTa"></textarea>
+      <input type="button" value="发表" id="detailsMessageBtn">
+      <ul id="detailsMessageUl">
+        <!-- <li>2356688</li>
+        <li>2356688</li>
+        <li>2356688</li> -->
+      </ul>
+   </div>
+
+   <ul class="details_btn" id="detailsBtn">
+     <li class="active"></li>
+     <li></li>
+   </ul>
+ </div>
+ <audio id="audio1"></audio>
+</body>
+</html>
